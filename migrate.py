@@ -6,9 +6,6 @@ from sys import exit, argv
 import os.path
 import importlib.util
 
-from datetime import datetime
-import shutil
-
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -33,7 +30,7 @@ files = os.listdir('migrations')
 
 #Percorre cada arquivo do diretório
 for file in files:
-    if file in ['__pycache__']:
+    if file in ['__pycache__', '.gitkeep']:
         continue
 
     module = importlib.util.spec_from_file_location("migrations", "migrations/"+file)
@@ -41,9 +38,17 @@ for file in files:
     module.loader.exec_module(module_from_spec)
 
     if action == 'migrate':
-        module_from_spec.up()
+        try:
+            module_from_spec.up()
+        except Exception as e:
+            print(f"{bcolors.FAIL} Erro: %s! {bcolors.ENDC}" % (str(e)))
+            exit()
     elif action == 'rollback':
-        module_from_spec.down()
+        try:
+            module_from_spec.down()
+        except Exception as e:
+            print(f"{bcolors.FAIL} Erro: %s! {bcolors.ENDC}" % (str(e)))
+            exit()
     else:
         print(f"{bcolors.FAIL}Esta aplicação não suporta isso! {bcolors.ENDC}")
         exit()
