@@ -5,17 +5,8 @@
 from sys import exit, argv
 import os.path
 import importlib.util
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+import database_migration_repository
+import bcolors
 
 #Verifica se usuário passou a ação
 try:
@@ -24,6 +15,8 @@ try:
 except:
     print(f"{bcolors.FAIL}Defina uma action antes de mais nada! {bcolors.ENDC}")
     exit()
+
+batch_id = database_migration_repository.get_batch_id();
 
 #Lista arquivos no diretorio
 files = os.listdir('migrations')
@@ -40,6 +33,7 @@ for file in files:
     if action == 'migrate':
         try:
             module_from_spec.up()
+            database_migration_repository.create_migration_register(file.replace(".py", ""), batch_id)
         except Exception as e:
             print(f"{bcolors.FAIL} Erro: %s! {bcolors.ENDC}" % (str(e)))
             exit()
@@ -52,3 +46,5 @@ for file in files:
     else:
         print(f"{bcolors.FAIL}Esta aplicação não suporta isso! {bcolors.ENDC}")
         exit()
+
+

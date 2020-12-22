@@ -1,0 +1,313 @@
+#!/bin/bash
+
+set -e
+
+cd `dirname $0`
+
+##SET COLORS
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+NC="\033[0m" # NoColor
+
+######################
+## DockerCompose Up ##
+######################
+migrate() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageUp
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    python migrate.py migrate
+}
+
+########################
+## DockerCompose Down ##
+########################
+down() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageDown
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+    docker-compose down
+}
+
+########################
+## DockerCompose Logs ##
+########################
+logs() {
+     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+     #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageLogs
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    docker-compose logs -f $args
+}
+
+########################
+## DockerCompose Logs ##
+########################
+exec() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageExec
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    docker-compose exec $args sh
+}
+
+##############################
+## DockerCompose Exec PHPCs ##
+##############################
+phpcs() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessagePHPCs
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    docker-compose exec app ./vendor/bin/phpcs  app/ --colors --standard=PSR12
+}
+
+##############################
+## DockerCompose Exec PHPMD ##
+##############################
+phpmd() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+   #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessagePHPMD
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    docker-compose exec app ./vendor/bin/phpmd app/ ansi ./phpmd.ruleset.xml
+}
+
+
+################################
+## DockerCompose Exec PHPUnit ##
+################################
+phpunit() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessagePHPUnit
+            exit 1;
+            ;;
+           *) ;;
+      esac
+    done
+
+    docker-compose exec app ./vendor/bin/phpunit --testdox --colors=always $args
+}
+
+#########################
+## Show Message Helper ##
+#########################
+helperMessage() {
+    echo -e "${GREEN} ## MS FLAGS COMMAND CENTRAL ${NC} Version 1.0.0 \n"
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}   command [options] \n"
+    echo -e "${YELLOW} Available Commands: "
+    echo -e "${GREEN}   up          ${NC} Start Docker Compose Containers if image no exists, build"
+    echo -e "${GREEN}   down        ${NC} Stop Docker Compose Containers"
+    echo -e "${GREEN}   logs        ${NC} Show Logs of container stdout, default is app container"
+    echo -e "${GREEN}   exec        ${NC} Access a container with 'sh'"
+    echo -e "${GREEN}   phpcs       ${NC} Execute PHPCs Inside APP Container and Show Results"
+    echo -e "${GREEN}   phpmd       ${NC} Execute PHPmd Inside APP Container and Show Results"
+    echo -e "${GREEN}   phpunit     ${NC} Execute PHPUnit Inside APP Container and Show Results"
+}
+
+####################################
+## Show Message Helper Up Command ##
+####################################
+helperMessageUp() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Start Docker Compose Containers if image no exists, build \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        up [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Build images before starting containers."
+    echo -e "${GREEN}   --build               ${NC} Build images before starting containers."
+    echo -e "${GREEN}   --remove-orphans      ${NC} Remove containers for services not defined in the Compose file."
+    echo -e "${GREEN}   --force-recreate      ${NC}  Recreate containers even if their configuration and image haven't changed."
+}
+
+######################################
+## Show Message Helper Logs Command ##
+######################################
+helperMessageLogs() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Show Logs of container stdout, default is app container \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        logs [CONTAINER_NAME] [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+######################################
+## Show Message Helper Exec Command ##
+######################################
+helperMessageExec() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Access a container with 'sh' \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        exec [CONTAINER_NAME] [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+#######################################
+## Show Message Helper PHPCS Command ##
+#######################################
+helperMessagePHPCs() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}      Execute PHPCs Inside APP Container and Show Results \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        phpcs [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+#######################################
+## Show Message Helper PHPMD Command ##
+#######################################
+helperMessagePHPMD() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Execute PHPmd Inside APP Container and Show Results \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        phpmd [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+#########################################
+## Show Message Helper PHPUnit Command ##
+#########################################
+helperMessagePHPUnit() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}      Execute PHPUnit Inside APP Container and Show Results \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        phpunit [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+######################################
+## Show Message Helper Down Command ##
+######################################
+helperMessageDown() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}      Stop Docker Compose Containers \n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        down [options] \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+}
+
+######################################
+## Function From->To call Functions ##
+######################################
+aliases() {
+    params="$*"
+    if [ -z "$1" ]
+    then
+        helperMessage
+    fi
+
+    arg="$1"; shift
+
+    case "$arg" in
+        "migrate" )
+            migrate "$@";;
+        "logs" )
+            logs "$@";;
+        "down" )
+            down "$@";;
+        "exec" )
+            exec "$@";;
+        "phpcs" )
+            phpcs "$@";;
+        "phpmd" )
+            phpmd "$@";;
+        "phpunit" )
+            phpunit "$@";;
+        *)
+            helperMessage;;
+    esac
+}
+
+###########
+## Start ##
+###########
+aliases "$@"
