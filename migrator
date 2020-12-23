@@ -27,13 +27,13 @@ migrate() {
       esac
     done
 
-    python migrate.py migrate
+    python migrator_function.py migrate
 }
 
 ########################
 ## DockerCompose Down ##
 ########################
-down() {
+rollback() {
     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
 
     #Check If Arg has treatment
@@ -47,7 +47,7 @@ down() {
            *) ;;
       esac
     done
-    docker-compose down
+    python migrator_function.py rollback
 }
 
 ########################
@@ -290,8 +290,8 @@ aliases() {
     case "$arg" in
         "migrate" )
             migrate "$@";;
-        "logs" )
-            logs "$@";;
+        "rollback" )
+            rollback "$@";;
         "down" )
             down "$@";;
         "exec" )
