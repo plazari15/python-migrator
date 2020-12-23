@@ -4,10 +4,45 @@ set -e
 
 cd `dirname $0`
 
+PWD=$(pwd)
+
+##SET FOLDERS
+MIGRATIONS_FOLDER=${PWD}/migrations #Mude caso deseje utilizar outra pasta
+
 ##SET COLORS
 GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
 NC="\033[0m" # NoColor
+
+######################
+## DockerCompose Up ##
+######################
+generate() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageGenerate
+            exit 1;
+            ;;
+        '--build')
+            docker build . --tag laravel_migration
+            ;;
+           *) ;;
+      esac
+    done
+
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
+
+    docker run \
+      --volume ${MIGRATIONS_FOLDER}:/app/migrations \
+      --env-file ${PWD}/.env \
+      laravel_migration:latest \
+      python generator.py ${arg}
+}
 
 ######################
 ## DockerCompose Up ##
@@ -20,14 +55,24 @@ migrate() {
      do
       case $arg in
         '-h')
-            helperMessageUp
+            helperMessageMigrate
             exit 1;
+            ;;
+        '--build')
+            docker build . --tag laravel_migration
             ;;
            *) ;;
       esac
     done
 
-    python migrator_function.py migrate
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
+
+    docker run \
+      --volume ${MIGRATIONS_FOLDER}:/app/migrations \
+      --env-file ${PWD}/.env \
+      --network bubble \
+      laravel_migration:latest \
+      python migrator_function.py migrate
 }
 
 ########################
@@ -41,238 +86,82 @@ rollback() {
      do
       case $arg in
         '-h')
-            helperMessageDown
+            helperMessageRollback
             exit 1;
             ;;
-           *) ;;
-      esac
-    done
-    python migrator_function.py rollback
-}
-
-########################
-## DockerCompose Logs ##
-########################
-logs() {
-     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
-
-     #Check If Arg has treatment
-    for arg in $args
-     do
-      case $arg in
-        '-h')
-            helperMessageLogs
-            exit 1;
+        '--build')
+            docker build . --tag laravel_migration
             ;;
            *) ;;
       esac
     done
 
-    docker-compose logs -f $args
-}
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
 
-########################
-## DockerCompose Logs ##
-########################
-exec() {
-    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
-
-    #Check If Arg has treatment
-    for arg in $args
-     do
-      case $arg in
-        '-h')
-            helperMessageExec
-            exit 1;
-            ;;
-           *) ;;
-      esac
-    done
-
-    docker-compose exec $args sh
-}
-
-##############################
-## DockerCompose Exec PHPCs ##
-##############################
-phpcs() {
-    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
-
-    #Check If Arg has treatment
-    for arg in $args
-     do
-      case $arg in
-        '-h')
-            helperMessagePHPCs
-            exit 1;
-            ;;
-           *) ;;
-      esac
-    done
-
-    docker-compose exec app ./vendor/bin/phpcs  app/ --colors --standard=PSR12
-}
-
-##############################
-## DockerCompose Exec PHPMD ##
-##############################
-phpmd() {
-    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
-
-   #Check If Arg has treatment
-    for arg in $args
-     do
-      case $arg in
-        '-h')
-            helperMessagePHPMD
-            exit 1;
-            ;;
-           *) ;;
-      esac
-    done
-
-    docker-compose exec app ./vendor/bin/phpmd app/ ansi ./phpmd.ruleset.xml
-}
-
-
-################################
-## DockerCompose Exec PHPUnit ##
-################################
-phpunit() {
-    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
-
-    #Check If Arg has treatment
-    for arg in $args
-     do
-      case $arg in
-        '-h')
-            helperMessagePHPUnit
-            exit 1;
-            ;;
-           *) ;;
-      esac
-    done
-
-    docker-compose exec app ./vendor/bin/phpunit --testdox --colors=always $args
+    docker run \
+      --volume ${MIGRATIONS_FOLDER}:/app/migrations \
+      --env-file ${PWD}/.env \
+      --network bubble \
+      laravel_migration:latest \
+      python migrator_function.py rollback
 }
 
 #########################
 ## Show Message Helper ##
 #########################
 helperMessage() {
-    echo -e "${GREEN} ## MS FLAGS COMMAND CENTRAL ${NC} Version 1.0.0 \n"
+    echo -e "${GREEN} ## MongoDB Migration ${NC} Version 1.0.0 \n"
     echo -e "${YELLOW} Usage: "
     echo -e "${NC}   command [options] \n"
     echo -e "${YELLOW} Available Commands: "
-    echo -e "${GREEN}   up          ${NC} Start Docker Compose Containers if image no exists, build"
-    echo -e "${GREEN}   down        ${NC} Stop Docker Compose Containers"
-    echo -e "${GREEN}   logs        ${NC} Show Logs of container stdout, default is app container"
-    echo -e "${GREEN}   exec        ${NC} Access a container with 'sh'"
-    echo -e "${GREEN}   phpcs       ${NC} Execute PHPCs Inside APP Container and Show Results"
-    echo -e "${GREEN}   phpmd       ${NC} Execute PHPmd Inside APP Container and Show Results"
-    echo -e "${GREEN}   phpunit     ${NC} Execute PHPUnit Inside APP Container and Show Results"
+    echo -e "${GREEN}   generate       ${NC} Generate a Migration File and Save in Migrations folder"
+    echo -e "${GREEN}   migrate        ${NC} Run All Migrations"
+    echo -e "${GREEN}   rollback       ${NC} Rollback Migration"
 }
 
 ####################################
 ## Show Message Helper Up Command ##
 ####################################
-helperMessageUp() {
+helperMessageGenerate() {
     echo -e "${YELLOW} Description: "
-    echo -e "${NC}     Start Docker Compose Containers if image no exists, build \n"
+    echo -e "${NC}     Generate a Migration File and save in migrations folder \n"
 
     echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        up [options] \n"
+    echo -e "${NC}        generate [options] MIGRATION_NAME \n"
 
     echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
-    echo -e "${GREEN}   --build               ${NC} Build images before starting containers."
-    echo -e "${GREEN}   --build               ${NC} Build images before starting containers."
-    echo -e "${GREEN}   --remove-orphans      ${NC} Remove containers for services not defined in the Compose file."
-    echo -e "${GREEN}   --force-recreate      ${NC}  Recreate containers even if their configuration and image haven't changed."
+    echo -e "${GREEN}   -h                    ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
 }
 
 ######################################
 ## Show Message Helper Logs Command ##
 ######################################
-helperMessageLogs() {
+helperMessageMigrate() {
     echo -e "${YELLOW} Description: "
-    echo -e "${NC}     Show Logs of container stdout, default is app container \n"
+    echo -e "${NC}     Run All Pending Migrations \n"
 
     echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        logs [CONTAINER_NAME] [options] \n"
+    echo -e "${NC}        migrate [options] \n"
 
     echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+    echo -e "${GREEN}   -h                    ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
 }
 
 ######################################
 ## Show Message Helper Exec Command ##
 ######################################
-helperMessageExec() {
+helperMessageRollback() {
     echo -e "${YELLOW} Description: "
-    echo -e "${NC}     Access a container with 'sh' \n"
+    echo -e "${NC}     Rollback last Migration executed\n"
 
     echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        exec [CONTAINER_NAME] [options] \n"
+    echo -e "${NC}        rollback [options] \n"
 
     echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
-}
-
-#######################################
-## Show Message Helper PHPCS Command ##
-#######################################
-helperMessagePHPCs() {
-    echo -e "${YELLOW} Description: "
-    echo -e "${NC}      Execute PHPCs Inside APP Container and Show Results \n"
-
-    echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        phpcs [options] \n"
-
-    echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
-}
-
-#######################################
-## Show Message Helper PHPMD Command ##
-#######################################
-helperMessagePHPMD() {
-    echo -e "${YELLOW} Description: "
-    echo -e "${NC}     Execute PHPmd Inside APP Container and Show Results \n"
-
-    echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        phpmd [options] \n"
-
-    echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
-}
-
-#########################################
-## Show Message Helper PHPUnit Command ##
-#########################################
-helperMessagePHPUnit() {
-    echo -e "${YELLOW} Description: "
-    echo -e "${NC}      Execute PHPUnit Inside APP Container and Show Results \n"
-
-    echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        phpunit [options] \n"
-
-    echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
-}
-
-######################################
-## Show Message Helper Down Command ##
-######################################
-helperMessageDown() {
-    echo -e "${YELLOW} Description: "
-    echo -e "${NC}      Stop Docker Compose Containers \n"
-
-    echo -e "${YELLOW} Usage: "
-    echo -e "${NC}        down [options] \n"
-
-    echo -e "${YELLOW} Options: "
-    echo -e "${GREEN}   -h, --help            ${NC} Ask For Support"
+    echo -e "${GREEN}   -h                    ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
 }
 
 ######################################
@@ -292,16 +181,8 @@ aliases() {
             migrate "$@";;
         "rollback" )
             rollback "$@";;
-        "down" )
-            down "$@";;
-        "exec" )
-            exec "$@";;
-        "phpcs" )
-            phpcs "$@";;
-        "phpmd" )
-            phpmd "$@";;
-        "phpunit" )
-            phpunit "$@";;
+        "generate" )
+            generate "$@";;
         *)
             helperMessage;;
     esac

@@ -2,7 +2,6 @@ from dotenv import load_dotenv, find_dotenv
 import pymongo
 import os
 
-
 load_dotenv(find_dotenv())
 
 def connect():

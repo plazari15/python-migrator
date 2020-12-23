@@ -68,3 +68,5 @@ elif action == 'rollback':
     rollback()
 
 
+#CRIAR DOCKER FILE E DOCKER COMPOSE
+#CRIAR SEED
