@@ -39,7 +39,7 @@ if you'd like to force another image build
 ## If I forget the commands?
 `./migrator --help`
 
-#TODO
+# TODO
 ================================================================================
 - Create a Seeder Folder and Install Python Faker to allow user create Fake Data
 - Improve Code
