@@ -8,6 +8,7 @@ PWD=$(pwd)
 
 ##SET FOLDERS
 MIGRATIONS_FOLDER=${PWD}/migrations #Mude caso deseje utilizar outra pasta
+DOCKER_FILE=${PWD}
 
 ##SET COLORS
 GREEN="\033[0;32m"
@@ -29,13 +30,13 @@ generate() {
             exit 1;
             ;;
         '--build')
-            docker build . --tag laravel_migration
+            docker build ${DOCKER_FILE} --tag laravel_migration
             ;;
            *) ;;
       esac
     done
 
-    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
@@ -59,13 +60,13 @@ migrate() {
             exit 1;
             ;;
         '--build')
-            docker build . --tag laravel_migration
+            docker build ${DOCKER_FILE} --tag laravel_migration
             ;;
            *) ;;
       esac
     done
 
-    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
@@ -90,13 +91,13 @@ rollback() {
             exit 1;
             ;;
         '--build')
-            docker build . --tag laravel_migration
+            docker build ${DOCKER_FILE} --tag laravel_migration
             ;;
            *) ;;
       esac
     done
 
-    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build . --tag laravel_migration
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
