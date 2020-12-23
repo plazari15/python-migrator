@@ -2,7 +2,7 @@ from sys import exit, argv
 import os.path
 import importlib.util
 import database_migration_repository
-from bcolors import bcolors
+from Helpers.bcolors import bcolors
 
 #Verifica se usuário passou a ação
 try:
