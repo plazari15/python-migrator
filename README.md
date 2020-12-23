@@ -9,7 +9,7 @@ This is a pack of scripts to Run a simple migration system in MongoDB Databases 
         `MIGRATIONS_FOLDER` and `DOCKER_FILE`
 3. You Can change the migrations folder too, if your project have your own migrations folder, you can point to same place.
 4. if your project have your own envs you can change it in the file config/mongodb.py
-
+5. Define Network in docker run command add this before image name `--network bubble /\`
 # How To Run?
 1. Dont Forget the folder where you put you `migrator`
 

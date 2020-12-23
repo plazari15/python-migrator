@@ -9,6 +9,7 @@ PWD=$(pwd)
 ##SET FOLDERS
 MIGRATIONS_FOLDER=${PWD}/migrations #Mude caso deseje utilizar outra pasta
 DOCKER_FILE=${PWD}
+ENV_FILE=${PWD}/.env
 
 ##SET COLORS
 GREEN="\033[0;32m"
@@ -40,7 +41,7 @@ generate() {
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
-      --env-file ${PWD}/.env \
+      --env-file ${ENV_FILE} \
       laravel_migration:latest \
       python generator.py ${arg}
 }
@@ -70,8 +71,7 @@ migrate() {
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
-      --env-file ${PWD}/.env \
-      --network bubble \
+      --env-file ${ENV_FILE} \
       laravel_migration:latest \
       python migrator_function.py migrate
 }
@@ -101,8 +101,7 @@ rollback() {
 
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
-      --env-file ${PWD}/.env \
-      --network bubble \
+      --env-file ${ENV_FILE} \
       laravel_migration:latest \
       python migrator_function.py rollback
 }
