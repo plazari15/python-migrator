@@ -59,4 +59,8 @@ def get_files_from_last_batch():
         ]
     ))
 
-    return last_files[0]
+    if len(last_files) == 0:
+        return False
+
+    if len(last_files) > 0:
+        return last_files[0]
