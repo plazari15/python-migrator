@@ -5,9 +5,10 @@ name = "pypi"
 
 [packages]
 pymongo = "*"
-python-dotenv = "*"
+faker = "*"
 
 [dev-packages]
+python-dotenv = "*"
 
 [requires]
 python_version = "3.9"

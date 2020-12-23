@@ -8,6 +8,7 @@ PWD=$(pwd)
 
 ##SET FOLDERS
 MIGRATIONS_FOLDER=${PWD}/migrations #Mude caso deseje utilizar outra pasta
+SEEDS_FOLDER=${PWD}/seeds #Mude caso deseje utilizar outra pasta
 DOCKER_FILE=${PWD}
 ENV_FILE=${PWD}/.env
 
@@ -16,9 +17,9 @@ GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
 NC="\033[0m" # NoColor
 
-######################
-## DockerCompose Up ##
-######################
+#############################
+## Generate Migration File ##
+#############################
 generate() {
     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
 
@@ -42,13 +43,14 @@ generate() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
+      --network bubble \
       laravel_migration:latest \
       python generator.py ${arg}
 }
 
-######################
-## DockerCompose Up ##
-######################
+####################
+## Run Migrations ##
+####################
 migrate() {
     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
 
@@ -72,13 +74,14 @@ migrate() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
+      --network bubble \
       laravel_migration:latest \
       python migrator_function.py migrate
 }
 
-########################
-## DockerCompose Down ##
-########################
+##################
+## Run Rollback ##
+##################
 rollback() {
     args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
 
@@ -102,21 +105,87 @@ rollback() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
+      --network bubble \
       laravel_migration:latest \
       python migrator_function.py rollback
+}
+
+#########################
+## Generate Seeds File ##
+#########################
+generateseeds() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageGenerateSeeds
+            exit 1;
+            ;;
+        '--build')
+            docker build ${DOCKER_FILE} --tag laravel_migration
+            ;;
+           *) ;;
+      esac
+    done
+
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
+
+    docker run \
+      --volume ${SEEDS_FOLDER}:/app/seeds \
+      --env-file ${ENV_FILE} \
+      --network bubble \
+      laravel_migration:latest \
+      python seeder_generator.py ${arg}
+}
+
+####################
+## Run Seeds File ##
+####################
+runseed() {
+    args=$(tr ' ' '\n' <<< "$@" | grep -v '^+' | tr '\n' ' ')
+
+    #Check If Arg has treatment
+    for arg in $args
+     do
+      case $arg in
+        '-h')
+            helperMessageRunSeeds
+            exit 1;
+            ;;
+        '--build')
+            docker build ${DOCKER_FILE} --tag laravel_migration
+            ;;
+           *) ;;
+      esac
+    done
+
+    [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
+
+    docker run \
+      --volume ${SEEDS_FOLDER}:/app/seeds \
+      --env-file ${ENV_FILE} \
+      --network bubble \
+      laravel_migration:latest \
+      python seeder_runner.py ${arg}
 }
 
 #########################
 ## Show Message Helper ##
 #########################
 helperMessage() {
-    echo -e "${GREEN} ## MongoDB Migration ${NC} Version 1.0.0 \n"
+    echo -e "${GREEN} ## MongoDB Migration ${NC} Version 1.1.0 \n"
     echo -e "${YELLOW} Usage: "
     echo -e "${NC}   command [options] \n"
     echo -e "${YELLOW} Available Commands: "
-    echo -e "${GREEN}   generate       ${NC} Generate a Migration File and Save in Migrations folder"
-    echo -e "${GREEN}   migrate        ${NC} Run All Migrations"
-    echo -e "${GREEN}   rollback       ${NC} Rollback Migration"
+    echo -e "${GREEN}   migrate               ${NC} Run All Migrations"
+    echo -e "${GREEN}   migrate:rollback      ${NC} Rollback Migration"
+    echo -e "${GREEN}   make:migration        ${NC} Generate a Migration File and Save in Migrations folder"
+    echo -e "${GREEN}   make:seed             ${NC} Generate a Seed File and Save in seeds folder"
+    echo -e "${GREEN}   run:seed              ${NC} Run All Seeds File. You can pass aditional parameters to run specific files"
+
 }
 
 ####################################
@@ -164,6 +233,39 @@ helperMessageRollback() {
     echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
 }
 
+#############################################
+## Show Message Helper Generate Seeds File ##
+#############################################
+helperMessageGenerateSeeds() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Generate Seeds File\n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        make:seed [options] SEED_NAME \n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h                    ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
+}
+
+########################################
+## Show Message Helper Run Seeds File ##
+########################################
+helperMessageRunSeeds() {
+    echo -e "${YELLOW} Description: "
+    echo -e "${NC}     Run Seeds File\n"
+
+    echo -e "${YELLOW} Usage: "
+    echo -e "${NC}        run:seed [options] seeds_file_name \n"
+
+    echo -e "${YELLOW} Params: "
+    echo -e "${GREEN}    seeds_file_name      ${NC} You can pass one or more file name to be seeded\n"
+
+    echo -e "${YELLOW} Options: "
+    echo -e "${GREEN}   -h                    ${NC} Ask For Support"
+    echo -e "${GREEN}   --build               ${NC} Force Image Build before starting containers."
+}
+
 ######################################
 ## Function From->To call Functions ##
 ######################################
@@ -179,10 +281,14 @@ aliases() {
     case "$arg" in
         "migrate" )
             migrate "$@";;
-        "rollback" )
+        "run:seed" )
+            runseed "$@";;
+        "migrate:rollback" )
             rollback "$@";;
-        "generate" )
+        "make:migration" )
             generate "$@";;
+        "make:seed" )
+            generateseeds "$@";;
         *)
             helperMessage;;
     esac

@@ -1,0 +1,22 @@
+from database_connector import mongo_db
+from providers import faker
+
+database = mongo_db.connect()
+fake = faker.init()
+
+"""
+See Python Faker Possible Methods in Faker Documentation
+@URL: https://faker.readthedocs.io/en/stable/providers.html
+"""
+
+
+def factory():
+    return {
+        "username": fake.name(),
+        "email": fake.free_email(),
+        "userId": fake.random_number()
+    }
+
+
+def run():
+    database.users.insert_one(factory())

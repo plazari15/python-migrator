@@ -1,4 +1,5 @@
 .idea
 migrations/*.py
+seeds/*.py
 __pycache__
 .env
