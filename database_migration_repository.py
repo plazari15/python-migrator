@@ -9,8 +9,21 @@ def create_migration_register(migration_name, batch_id):
         "batch": batch_id
     })
 
-def get_batch_id():
-    last_register = database.migrations.find().sort("batch", pymongo.DESCENDING).limit(1)[0]
+def check_file(migration_name):
+    counter = database.migrations.find({
+        "migration": migration_name
+    }).count()
 
-    if last_register is not None:
-        return last_register['batch'] + 1
+    if counter > 0:
+        return False
+
+    return True
+
+def get_batch_id():
+    last_register = list(database.migrations.find().sort("batch", pymongo.DESCENDING).limit(1))
+
+    if len(last_register) == 0:
+        return 1
+
+    if len(last_register) > 0:
+        return last_register[0]['batch'] + 1
