@@ -1,9 +1,9 @@
 from sys import exit, argv
-from bcolors import bcolors
+from Helpers.bcolors import bcolors
 import importlib.util
 import os.path
 
-seeds_file = os.listdir('seeds')
+seeds_file = os.listdir('seeds/')
 
 files_to_seed = argv[1]
 seed_files = None

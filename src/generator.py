@@ -2,7 +2,7 @@ from sys import exit, argv
 from datetime import datetime
 import os.path
 import shutil
-from bcolors import bcolors
+from Helpers.bcolors import bcolors
 
 try:
     filename = argv[1]
@@ -17,4 +17,4 @@ if os.path.isfile(path_file):
     print(f"{bcolors.FAIL}Arquivo de migration já existe {bcolors.ENDC}")
     exit()
 
-shutil.copy("stubs/blank.stub", path_file)
+shutil.copy("src/stubs/blank.stub", path_file)
