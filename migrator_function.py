@@ -20,23 +20,22 @@ def migrate():
     files = os.listdir('migrations')
     if len(files) > 0:
         for file in files:
-            if file in ['__pycache__', '.gitkeep']:
-                continue
-            file_name = file.replace(".py", "")
+            if file.endswith(".py"):
+                file_name = file.replace(".py", "")
 
-            module = importlib.util.spec_from_file_location("migrations", "migrations/"+file)
-            module_from_spec = importlib.util.module_from_spec(module)
-            module.loader.exec_module(module_from_spec)
+                module = importlib.util.spec_from_file_location("migrations", "migrations/"+file)
+                module_from_spec = importlib.util.module_from_spec(module)
+                module.loader.exec_module(module_from_spec)
 
-            try:
-                if database_migration_repository.check_file(file_name):
-                    print(f"{bcolors.WARNING}Migrating: %s {bcolors.ENDC}" % file_name)
-                    module_from_spec.up()
-                    database_migration_repository.create_migration_register(file_name, batch_id)
-                    print(f"{bcolors.OKGREEN}Migrated: %s {bcolors.ENDC}" % file_name)
-            except Exception as e:
-                print(f"{bcolors.FAIL} Erro: %s! {bcolors.ENDC}" % (str(e)))
-                exit()
+                try:
+                    if database_migration_repository.check_file(file_name):
+                        print(f"{bcolors.WARNING}Migrating: %s {bcolors.ENDC}" % file_name)
+                        module_from_spec.up()
+                        database_migration_repository.create_migration_register(file_name, batch_id)
+                        print(f"{bcolors.OKGREEN}Migrated: %s {bcolors.ENDC}" % file_name)
+                except Exception as e:
+                    print(f"{bcolors.FAIL} Erro: %s! {bcolors.ENDC}" % (str(e)))
+                    exit()
     else:
         print(f"{bcolors.WARNING} %s! {bcolors.ENDC}" % ("Nothing to Migrate"))
         exit()
