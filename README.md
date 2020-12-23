@@ -3,6 +3,7 @@
 This is a pack of scripts to Run a simple migration system in MongoDB Databases out of the box.
 
 # How To Setup In My Project?
+================================================================================
 1. clone this repository to the root of your project.
 2. if you want, you can copy `migrator` to the root of your project, but dont forget to make the correct adjusts in the file
     a. if you decide to change migrator file of place You'll need to change lines 10,11 
@@ -11,6 +12,7 @@ This is a pack of scripts to Run a simple migration system in MongoDB Databases 
 4. if your project have your own envs you can change it in the file config/mongodb.py
 5. Define Network in docker run command add this before image name `--network bubble /\`
 # How To Run?
+================================================================================
 1. Dont Forget the folder where you put you `migrator`
 
 ### Generate Migration File
@@ -36,3 +38,18 @@ if you'd like to force another image build
 
 ## If I forget the commands?
 `./migrator --help`
+
+#TODO
+================================================================================
+- Create a Seeder Folder and Install Python Faker to allow user create Fake Data
+- Improve Code
+
+Contributing
+================================================================================
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
