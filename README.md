@@ -41,8 +41,10 @@ if you'd like to force another image build
 
 # TODO
 ================================================================================
-- Create a Seeder Folder and Install Python Faker to allow user create Fake Data
 - Improve Code
+- Create UnitTests (using pytest)
+- Install TravisCI to run tests automatically
+- Create Integrations with other databases
 
 Contributing
 ================================================================================
