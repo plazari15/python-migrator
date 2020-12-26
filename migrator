@@ -45,7 +45,7 @@ generate() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/generator.py ${arg}
+      python generator.py ${arg}
 }
 
 ####################
