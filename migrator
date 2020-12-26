@@ -138,7 +138,7 @@ generateseeds() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/seeder_generator.py ${arg}
+      python seeder_generator.py ${arg}
 }
 
 ####################
