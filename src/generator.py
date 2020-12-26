@@ -2,7 +2,7 @@ from sys import exit, argv
 from datetime import datetime
 import os.path
 import shutil
-from Helpers.bcolors import bcolors
+from src.Helpers.bcolors import bcolors
 
 def generate_migration_file(migration_name):
     timestamp_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%s")
