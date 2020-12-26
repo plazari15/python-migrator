@@ -5,6 +5,6 @@ services:
 
 before_install:
   - docker build --build-arg ENV=travisci -t laravel_migration .
-  - docker run laravel_migration:latest "python3 -m pytest"
+  - docker run laravel_migration:latest python -m pytest
 
 script: pytest
