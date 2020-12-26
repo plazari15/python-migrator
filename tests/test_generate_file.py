@@ -2,7 +2,7 @@ import os
 import os.path
 import sys
 
-from app.generator import generate_migration_file
+from generator import generate_migration_file
 
 
 def test_generate_migration_file():
