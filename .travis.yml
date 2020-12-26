@@ -1,8 +1,10 @@
-language: python
-python:
-  - "3.9"
+language: ruby
+services:
+  - docker
 
-install:
-  - pip install -r requirements.txt
+
+before_install:
+  - docker build --build-arg ENV=travisci -t laravel_migration .
+  - docker run laravel_migration:latest "python3 -m pytest"
 
 script: pytest
