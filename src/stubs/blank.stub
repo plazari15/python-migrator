@@ -1,4 +1,4 @@
-from database_connector import mongo_db
+from src.database_connector import mongo_db
 database = mongo_db.connect()
 
 def up():
