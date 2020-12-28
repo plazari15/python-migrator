@@ -14,8 +14,7 @@ before_install:
 script: docker run --network host --env MONGODB_URI=mongodb://127.0.0.1:27017 --env MONGO_DB=teste laravel_migration:latest python -m pytest
 
 before_deploy:
-- cd ..
-- tar -zcf ${TRAVIS_BUILD_DIR}${REPO}-${BUILD_ENV}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.tar.gz ${REPO}
+  - tar -zcf ${TRAVIS_BUILD_DIR}${REPO}-${BUILD_ENV}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.tar.gz ${REPO}
 
 deploy:
   provider: releases
