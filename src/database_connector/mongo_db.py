@@ -1,5 +1,5 @@
 import pymongo
-from config import mongodb
+from src.config import mongodb
 
 def connect():
     mongo_client = pymongo.MongoClient(mongodb.MONGODB_URI)
