@@ -18,9 +18,5 @@ deploy:
   token: $GITHUB_OAUTH_TOKEN
   file_glob: true
   draft: true
-  file:
-    - migrations/*
-    - seeds/*
-    - src/**/*
   on:
     tags: true
