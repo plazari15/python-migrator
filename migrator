@@ -178,7 +178,7 @@ runseed() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/seeder_runner.py ${arg}
+      python seeder_runner.py ${arg}
 }
 
 #########################

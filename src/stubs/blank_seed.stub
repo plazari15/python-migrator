@@ -1,5 +1,5 @@
-from database_connector import mongo_db
-from providers import faker
+from src.database_connector import mongo_db
+from src.providers import faker
 
 database = mongo_db.connect()
 fake = faker.init()
