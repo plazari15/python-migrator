@@ -15,11 +15,12 @@ script: docker run --network host --env MONGODB_URI=mongodb://127.0.0.1:27017 --
 
 deploy:
   provider: releases
-  api_key: $GITHUB_OAUTH_TOKEN
+  token: $GITHUB_OAUTH_TOKEN
+  file_glob: true
+  draft: true
   file:
     - migrations/*
     - seeds/*
     - src/**/*
-  skip_cleanup: true
   on:
     tags: true
