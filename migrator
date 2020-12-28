@@ -45,7 +45,7 @@ generate() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/generator.py ${arg}
+      python generator.py ${arg}
 }
 
 ####################
@@ -76,7 +76,7 @@ migrate() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/migrator_function.py migrate
+      python migrator_function.py migrate
 }
 
 ##################
@@ -107,7 +107,7 @@ rollback() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/migrator_function.py rollback
+      python migrator_function.py rollback
 }
 
 #########################
@@ -138,7 +138,7 @@ generateseeds() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/seeder_generator.py ${arg}
+      python seeder_generator.py ${arg}
 }
 
 ####################
@@ -164,21 +164,13 @@ runseed() {
 
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
-#docker run \
-#      -it \
-#      --volume /Users/pedrolazari/Code/laravel-migrator/seeds/:/app/seeds \
-#      --volume /Users/pedrolazari/Code/laravel-migrator/migrations/:/app/migrations \
-#      --env-file /Users/pedrolazari/Code/laravel-migrator/.env \
-#      laravel_migration:latest \
-#      /bin/bash
-
     docker run \
       -it \
       --volume ${SEEDS_FOLDER}:/app/seeds \
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python src/seeder_runner.py ${arg}
+      python seeder_runner.py ${arg}
 }
 
 #########################

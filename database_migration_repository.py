@@ -1,4 +1,4 @@
-from database_connector import mongo_db
+from src.database_connector import mongo_db
 import pymongo
 
 database = mongo_db.connect()

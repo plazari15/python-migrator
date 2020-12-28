@@ -2,6 +2,9 @@
 
 This is a pack of scripts to Run a simple migration system in MongoDB Databases out of the box.
 
+[![Build Status](https://travis-ci.com/plazari15/python-migrator.svg?branch=main)](https://travis-ci.com/plazari15/python-migrator)
+
+
 # How To Setup In My Project?
 ================================================================================
 1. clone this repository to the root of your project.

@@ -1,0 +1,14 @@
+language: python
+services:
+  - docker
+  - mongodb
+
+before_script:
+  - sleep 15
+#  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+
+
+before_install:
+  - docker build --build-arg ENV=travisci -t laravel_migration .
+
+script: docker run --network host --env MONGODB_URI=mongodb://127.0.0.1:27017 --env MONGO_DB=teste laravel_migration:latest python -m pytest
