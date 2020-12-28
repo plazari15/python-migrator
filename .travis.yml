@@ -18,5 +18,18 @@ deploy:
   token: $GITHUB_OAUTH_TOKEN
   file_glob: true
   draft: true
+  file:
+    - migrations/*
+    - seeds/*
+    - src/*
+    - .env.example
+    - database_migration_repository.py
+    - generator.py
+    - migrator
+    - migrator_function.py
+    - requirements.txt
+    - seeder_generator.py
+    - seeder_runner.py
+    - Dockerfile
   on:
     tags: true
