@@ -5,8 +5,6 @@ services:
 
 before_script:
   - sleep 15
-#  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
-
 
 before_install:
   - docker build --build-arg ENV=travisci -t laravel_migration .
@@ -16,10 +14,10 @@ script: docker run --network host --env MONGODB_URI=mongodb://127.0.0.1:27017 --
 before_deploy:
   - tar -zcf ${TRAVIS_BUILD_DIR}${REPO}-${BUILD_ENV}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.tar.gz ${REPO}
 
-deploy:
-  provider: releases
-  token: $GITHUB_OAUTH_TOKEN
-  file: ${TRAVIS_BUILD_DIR}${REPO}-${BUILD_ENV}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.tar.gz
-  draft: true
-  on:
-    tags: true
+#deploy:
+#  provider: releases
+#  token: $GITHUB_OAUTH_TOKEN
+#  file: ${TRAVIS_BUILD_DIR}${REPO}-${BUILD_ENV}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.tar.gz
+#  draft: true
+#  on:
+#    tags: true
