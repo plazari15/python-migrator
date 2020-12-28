@@ -1,7 +1,7 @@
 from sys import exit, argv
 import os.path
 import importlib.util
-from src.Helpers.bcolors import bcolors
+from package.Helpers.bcolors import bcolors
 from database_migration_repository import create_migration_register, get_files_from_last_batch, \
     delete_migration_register, get_batch_id, check_file
 
@@ -66,4 +66,5 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(f"{bcolors.FAIL}Defina uma action antes de mais nada! {bcolors.ENDC}")
+        raise e
         exit()

@@ -45,7 +45,7 @@ generate() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python generator.py ${arg}
+      python src/generator.py ${arg}
 }
 
 ####################
@@ -76,7 +76,7 @@ migrate() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python migrator_function.py migrate
+      python src/migrator_function.py migrate
 }
 
 ##################
@@ -107,7 +107,7 @@ rollback() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python migrator_function.py rollback
+      python src/migrator_function.py rollback
 }
 
 #########################
@@ -138,7 +138,7 @@ generateseeds() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python seeder_generator.py ${arg}
+      python src/seeder_generator.py ${arg}
 }
 
 ####################
@@ -170,7 +170,7 @@ runseed() {
       --env-file ${ENV_FILE} \
       --network bubble \
       laravel_migration:latest \
-      python seeder_runner.py ${arg}
+      python src/seeder_runner.py ${arg}
 }
 
 #########################
