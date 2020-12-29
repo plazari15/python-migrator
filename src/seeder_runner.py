@@ -1,5 +1,5 @@
 from sys import exit, argv
-from src.Helpers.bcolors import bcolors
+from package.Helpers.bcolors import bcolors
 import importlib.util
 import os.path
 

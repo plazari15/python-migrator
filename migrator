@@ -12,6 +12,10 @@ SEEDS_FOLDER=${PWD}/seeds #Mude caso deseje utilizar outra pasta
 DOCKER_FILE=${PWD}
 ENV_FILE=${PWD}/.env
 
+#PYTHON_MIGRATOR_DOCKER_NETWORK=host #ALTERE ESSE VALOR CASO VOCÊ QUEIRA USAR UMA REDE DOCKER
+
+export $(grep -v '^#' .env | xargs -0)
+
 ##SET COLORS
 GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
@@ -43,9 +47,9 @@ generate() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
-      --network bubble \
+      --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
       laravel_migration:latest \
-      python generator.py ${arg}
+      python src/generator.py ${arg}
 }
 
 ####################
@@ -74,9 +78,9 @@ migrate() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
-      --network bubble \
+      --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
       laravel_migration:latest \
-      python migrator_function.py migrate
+      python src/migrator_function.py migrate
 }
 
 ##################
@@ -105,9 +109,9 @@ rollback() {
     docker run \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
-      --network bubble \
+      --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
       laravel_migration:latest \
-      python migrator_function.py rollback
+      python src/migrator_function.py rollback
 }
 
 #########################
@@ -136,9 +140,9 @@ generateseeds() {
     docker run \
       --volume ${SEEDS_FOLDER}:/app/seeds \
       --env-file ${ENV_FILE} \
-      --network bubble \
+      --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
       laravel_migration:latest \
-      python seeder_generator.py ${arg}
+      python src/seeder_generator.py ${arg}
 }
 
 ####################
@@ -168,9 +172,9 @@ runseed() {
       -it \
       --volume ${SEEDS_FOLDER}:/app/seeds \
       --env-file ${ENV_FILE} \
-      --network bubble \
+      --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
       laravel_migration:latest \
-      python seeder_runner.py ${arg}
+      python src/seeder_runner.py ${arg}
 }
 
 #########################
