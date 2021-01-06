@@ -45,6 +45,7 @@ generate() {
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
+      --rm \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
       --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
@@ -76,6 +77,7 @@ migrate() {
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
+      --rm \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
       --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
@@ -107,6 +109,7 @@ rollback() {
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
+      --rm \
       --volume ${MIGRATIONS_FOLDER}:/app/migrations \
       --env-file ${ENV_FILE} \
       --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
@@ -138,6 +141,7 @@ generateseeds() {
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
+      --rm \
       --volume ${SEEDS_FOLDER}:/app/seeds \
       --env-file ${ENV_FILE} \
       --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
@@ -169,7 +173,7 @@ runseed() {
     [ ! -z $(docker images -q  laravel_migration:latest) ] || docker build ${DOCKER_FILE} --tag laravel_migration
 
     docker run \
-      -it \
+      --rm \
       --volume ${SEEDS_FOLDER}:/app/seeds \
       --env-file ${ENV_FILE} \
       --network ${PYTHON_MIGRATOR_DOCKER_NETWORK} \
