@@ -1,0 +1,2 @@
+def define(seedList):
+    seedList.runner("create_users")
