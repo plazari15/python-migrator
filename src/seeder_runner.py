@@ -3,7 +3,16 @@ from package.Helpers.bcolors import bcolors
 import importlib.util
 import os.path
 
+import multiprocessing
+
+def run_seed_function(file):
+    module = importlib.util.spec_from_file_location("seeds", "seeds/" + file)
+    module_from_spec = importlib.util.module_from_spec(module)
+    module.loader.exec_module(module_from_spec)
+    module_from_spec.run()
+
 def run_seeders():
+    queue = multiprocessing.Queue(-1)
     seed_files = None
     try:
         files_to_seed = argv[1]
@@ -37,10 +46,9 @@ def run_seeders():
         for file in seed_files:
             try:
                 file = file if file.endswith(".py") else file + ".py"
-                module = importlib.util.spec_from_file_location("seeds", "seeds/" + file)
-                module_from_spec = importlib.util.module_from_spec(module)
-                module.loader.exec_module(module_from_spec)
-                module_from_spec.run()
+                worker = multiprocessing.Process(target=run_seed_function, args=(file,))
+                worker.start() #Starta o processo
+                worker.join() #Segura o for até a conclusão do SubProcesso.
                 print(f"{bcolors.OKGREEN} Seeded: %s {bcolors.ENDC}" % (file))
             except Exception as e:
                 print(f"{bcolors.WARNING} Couldn't seed: %s {bcolors.ENDC}" % (file))
